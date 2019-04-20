@@ -265,6 +265,14 @@ func NewMessageFromServer(content []byte) (*Message, error) {
 
 	for _, item := range items {
 		kv := strings.SplitN(item, "@=", 2)
+		if len(kv) == 0 {
+			msg.SetField("nomsg", "nomsgvalue")
+			continue
+		}
+		if len(kv) == 1 {
+			msg.SetField(kv[0], "nomsgvalue")
+			continue
+		}
 		msg.SetField(kv[0], kv[1])
 	}
 

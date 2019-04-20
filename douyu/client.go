@@ -104,13 +104,24 @@ func (c *Client) Watch() error {
 		// 为了解决有时无法完整读取content的bug
 		length := 0
 		for contentLength > length {
+			if contentLength > len(buffer)-1 {
+				contentLength = len(buffer) - 1
+			}
+			if length >= len(buffer)-1 {
+				break
+			}
 			nr, err2 := c.Read(buffer[length:contentLength])
 			if err2 != nil {
 				return errors.New("读取消息正文失败 " + err2.Error())
 			}
 			length += nr
 		}
-
+		if len(buffer) <= 1 {
+			continue
+		}
+		if length >= len(buffer) {
+			length = len(buffer) - 1
+		}
 		message, err := NewMessageFromServer(buffer[:length-1])
 		if err != nil {
 			return err
